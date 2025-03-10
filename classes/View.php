@@ -48,22 +48,95 @@ class View {
                     </ul>
                 </div>
                 </div>
-
             </nav>
         </header>
+        
         <style>
-            /* navbar responsive */
+        /* Base navbar styles */
         .navbar-static-top {
+            min-height: 50px;
+        }
+        .navbar-brand {
+            height: 50px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+        }
+        .navbar-custom-menu {
+            display: flex;
+            align-items: center;
             height: 50px;
         }
-        .container[name="navbar"] {
+        .nav.navbar-nav {
             display: flex;
-            justify-content: space-between;
-            flex-grow: 1;
-            width: 100%;
-            padding: 10 50px;
+            flex-direction: row;
+            align-items: center;
+            margin: 0;
         }
-    </style>
+        .nav.navbar-nav > li {
+            float: left;
+        }
+        .nav.navbar-nav > li > a {
+            padding-top: 0;
+            padding-bottom: 0;
+            line-height: 50px;
+        }
+        
+        /* Mobile styles (small screens) */
+        @media screen and (max-width: 500px) {
+            .welcome_line, 
+            .user.user-menu {
+                display: none !important;
+            }
+            .navbar-custom-menu {
+                position: absolute;
+                right: 0;
+                top: 0;
+            }
+            .container[name="navbar"] {
+                padding-right: 100px;
+            }
+        }
+        
+        /* Fix navbar stacking at this specific widths */
+        @media screen and (min-width: 501px) and (max-width: 769px) {
+            .navbar-custom-menu {
+                position: absolute;
+                right: 15px;
+                top: 0;
+            }
+            .nav.navbar-nav {
+                white-space: nowrap;
+            }
+            .nav.navbar-nav > li {
+                float: left !important;
+                display: block !important;
+            }
+            .container[name="navbar"] {
+                padding-right: 100px;
+                min-height: 50px;
+            }
+        }
+
+        /* Submit modal buttons */
+        .my-swal .swal2-actions {
+            width: 100%;
+        }
+
+        .my-swal .swal2-confirm, .my-swal .swal2-cancel {
+            width: 45%;
+            margin: 1 !important;
+            padding: 10px 0px;
+            font-size: 12px;
+            letter-spacing: 1.3px;
+        }
+
+        .my-swal .swal2-cancel{
+            color:rgb(94, 87, 87);
+            background-color:rgb(212, 209, 209) !important;
+        }
+        
+        </style>
         <?php
         return ob_get_clean();
     }
@@ -169,14 +242,14 @@ class View {
             });
 
             // Platform button handler
-            $(document).on('click', '.platform', function(e){
-                e.preventDefault();
-                $('#platform').modal('show');
-                var platform = $(this).data('platform');
-                var fullname = $(this).data('fullname');
-                $('.candidate').html(fullname);
-                $('#plat_view').html(platform);
-            });
+            // $(document).on('click', '.platform', function(e){
+            //     e.preventDefault();
+            //     $('#platform').modal('show');
+            //     var platform = $(this).data('platform');
+            //     var fullname = $(this).data('fullname');
+            //     $('.candidate').html(fullname);
+            //     $('#plat_view').html(platform);
+            // });
 
             // Preview button handler
             $(document).on('click', '#preview', function(e) {
@@ -267,13 +340,14 @@ class View {
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#239746',
-                    cancelButtonColor: '#d33',
+                    cancelButtonColor: '#afafaf',
                     confirmButtonText: 'Confirm',
                     showLoaderOnConfirm: true,
                     allowOutsideClick: () => !Swal.isLoading(),
                     customClass: {
                         container: 'my-swal'
-                    }
+                    },
+                    reverseButtons: true
                 }).then((result) => {
                     if (result.isConfirmed) {
                         // Show loading state
