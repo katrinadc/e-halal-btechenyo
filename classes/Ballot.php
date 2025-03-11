@@ -3,6 +3,7 @@ require_once __DIR__ . '/../init.php';
 require_once __DIR__ . '/Database.php';
 require_once __DIR__ . '/CustomSessionHandler.php';
 require_once __DIR__ . '/Votes.php';
+require_once __DIR__ . '/Receipt.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
@@ -299,9 +300,7 @@ HTML;
             }
             
             // Check if voter has already voted
-            $sql = "SELECT has_voted, firstname, lastname, student_number 
-                    FROM voters 
-                    WHERE id = ?";
+            $sql = "SELECT has_voted FROM voters WHERE id = ?";
             $stmt = $this->db->prepare($sql);
             $stmt->bind_param("i", $voter_id);
             $stmt->execute();
@@ -321,26 +320,9 @@ HTML;
             if (!$voteResult['success']) {
                 throw new Exception("Failed to submit votes. Please try again.");
             }
-
-            // Generate and send receipt
-            $result = $this->generateReceipt(
-                $voteResult['vote_ref'],
-                $voter,
-                $votes,
-                $this->getCurrentElection()
-            );
-
-            if (!$result['success']) {
-                // Log the error but don't stop the process
-                error_log("Failed to send receipt: " . $result['message']);
-            }
-
+            
             $this->db->commit();
-            return [
-                'success' => true,
-                'vote_ref' => $voteResult['vote_ref'],
-                'message' => 'Vote submitted successfully'
-            ];
+            return $voteResult;
             
         } catch (Exception $e) {
             $this->db->rollback();
@@ -349,12 +331,6 @@ HTML;
                 'message' => $e->getMessage()
             ];
         }
-    }
-
-    private function getCurrentElection() {
-        $sql = "SELECT * FROM election_status WHERE status = 'on' LIMIT 1";
-        $result = $this->db->query($sql);
-        return $result->fetch_assoc();
     }
 
     public function getVoterVotes($voter_id) {
